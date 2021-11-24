@@ -1,5 +1,6 @@
 import schemas
 import models
+import hashing
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import mode
 from fastapi import HTTPException, status
@@ -9,7 +10,7 @@ def create(request: schemas.User, db: Session):
     new_user = models.User(
         name = request.name,
         email = request.email,
-        password = request.password
+        password = hashing.Hash.bcrypt(request.password)
     )
     db.add(new_user)
     db.commit()
