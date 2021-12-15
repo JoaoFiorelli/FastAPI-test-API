@@ -1,16 +1,16 @@
-import schemas
-import models
-import hashing
+from ..schemas import User
+from ..models import *
+from ..hashing import *
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import mode
 from fastapi import HTTPException, status
 
 
-def create(request: schemas.User, db: Session):
-    new_user = models.User(
+def create(request: User, db: Session):
+    new_user = User(
         name = request.name,
         email = request.email,
-        password = hashing.Hash.bcrypt(request.password)
+        password = Hash.bcrypt(request.password)
     )
     db.add(new_user)
     db.commit()
@@ -19,20 +19,20 @@ def create(request: schemas.User, db: Session):
 
 
 def get_all(db: Session):
-    users = db.query(models.User).all()
+    users = db.query(User).all()
     return users
 
 
 def show(id: int, db: Session):
-    user = db.query(models.User).filter(models.User.id == id).first()
+    user = db.query(User).filter(User.id == id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with the id {id} is not available")
     return user
 
 
-def update_user(id: int, request: schemas.User, db: Session):
-    user = db.query(models.User).filter(models.User.id == id)
+def update_user(id: int, request: User, db: Session):
+    user = db.query(User).filter(User.id == id)
 
     if not user.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -44,7 +44,7 @@ def update_user(id: int, request: schemas.User, db: Session):
 
 
 def destroy(id: int, db: Session):
-    user = db.query(models.User).filter(models.User.id == id)
+    user = db.query(User).filter(User.id == id)
 
     if not user.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
